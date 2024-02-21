@@ -61,6 +61,7 @@ export default function Swiper({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    backgroundColor: "#111",
   },
   gesturecontainer: {
     flex: 1,

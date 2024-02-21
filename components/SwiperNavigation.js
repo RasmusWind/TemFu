@@ -33,7 +33,7 @@ const styles = StyleSheet.create({
     justifyContent: "space-around",
   },
   labels: {
-    color: "black",
+    color: "white",
     padding: 5,
     borderBottomWidth: 1,
     borderStyle: "solid",

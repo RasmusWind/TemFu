@@ -1,24 +1,39 @@
-import { useState } from "react";
-import { StyleSheet, View, TextInput, Button, Text } from "react-native";
+import { useState, useEffect, useContext } from "react";
+import {
+  StyleSheet,
+  View,
+  TextInput,
+  Button,
+  Text,
+  BackHandler,
+} from "react-native";
 import client from "../client";
 import SignUpComponent from "./SignUpComponent";
+import { useUserContext } from "../context/UserContext";
 
-export default function LoginComponent({ setCurrentUser, setCurrentToken }) {
+export default function LoginComponent() {
+  const userContext = useUserContext();
   const [username, setUsername] = useState("raller");
   const [password, setPassword] = useState("Pass1234!");
   const [signUp, setSignUp] = useState(false);
 
+  function handleBackButtonClick() {}
+
+  useEffect(() => {
+    BackHandler.addEventListener("hardwareBackPress", handleBackButtonClick);
+  }, []);
+
   function submitLogin(e) {
     client
-      .post("/login", {
+      .post("/login", "", {
         username: username,
         password: password,
       })
       .then(function (response) {
         let token = response.data.token;
         let user = response.data.user;
-        setCurrentToken(token);
-        setCurrentUser(user);
+        userContext.setToken(token);
+        userContext.setUser(user);
       })
       .catch(function (err) {
         console.log(err);
@@ -36,17 +51,19 @@ export default function LoginComponent({ setCurrentUser, setCurrentToken }) {
           style={styles.input}
           onChangeText={setUsername}
           value={username}
+          placeholderTextColor="white"
         />
         <TextInput
           style={styles.input}
           onChangeText={setPassword}
           value={password}
           secureTextEntry={true}
+          placeholderTextColor="white"
         />
         <Button onPress={submitLogin} title="Log in" />
       </View>
       <View style={styles.footer}>
-        <Text>Don't have an account?</Text>
+        <Text style={{ color: "white" }}>Don't have an account?</Text>
         <Button onPress={() => setSignUp(true)} title="Sign up" color="#888" />
       </View>
     </View>
@@ -56,11 +73,14 @@ export default function LoginComponent({ setCurrentUser, setCurrentToken }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: "#fff",
+    backgroundColor: "#111",
     alignItems: "center",
     justifyContent: "center",
+    color: "white",
   },
   input: {
+    color: "white",
+    borderColor: "white",
     height: 40,
     width: 200,
     margin: 12,

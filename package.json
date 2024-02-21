@@ -15,7 +15,9 @@
     "expo-document-picker": "^11.10.1",
     "react": "^18.2.0",
     "react-native": "^0.73.4",
-    "react-native-swipe-gestures": "^1.0.5"
+    "react-native-navigation-bar-color": "^2.0.2",
+    "react-native-swipe-gestures": "^1.0.5",
+    "react-native-vector-icons": "^10.0.3"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

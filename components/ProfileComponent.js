@@ -7,32 +7,25 @@ import {
   Button,
 } from "react-native";
 import client from "../client";
+import { useUserContext } from "../context/UserContext";
 
-export default function ProfileComponent({
-  currentUser,
-  setCurrentUser,
-  currentToken,
-  setCurrentToken,
-}) {
+export default function ProfileComponent() {
+  const userContext = useUserContext();
   function reloadUser() {
     client
-      .get("/get_user", {
-        headers: {
-          Authorization: `Token ${currentToken}`,
-        },
-      })
+      .get("/get_user", currentToken)
       .then(function (res) {
         let token = response.data.token;
         let user = response.data.user;
-        setCurrentToken(token);
-        setCurrentUser(user.username);
+        userContext.setToken(token);
+        userContext.setUser(user.username);
       })
       .catch(function (err) {});
   }
 
   function logOut() {
-    setCurrentUser();
-    setCurrentToken();
+    userContext.setUser();
+    userContext.setToken();
   }
 
   return (
@@ -46,7 +39,7 @@ export default function ProfileComponent({
       <TouchableHighlight onPress={reloadUser} style={styles.touchable}>
         <Image
           source={{
-            uri: `${client.getUri()}/media/reload.png`,
+            uri: `${client.baseURL}/media/reload.png`,
           }}
           style={styles.reload}
         />
@@ -54,9 +47,11 @@ export default function ProfileComponent({
       <View style={styles.container}>
         <Image
           style={styles.image}
-          source={{ uri: `${client.getUri()}/${currentUser.profile.image}` }}
+          source={{
+            uri: `${client.baseURL}/${userContext.user.profile.image}`,
+          }}
         />
-        <Text>{currentUser.username}</Text>
+        <Text style={{ color: "white" }}>{userContext.user.username}</Text>
       </View>
       <Button style={styles.logout} title="Log out" onPress={logOut} />
     </View>
