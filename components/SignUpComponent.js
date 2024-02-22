@@ -8,7 +8,7 @@ import {
   BackHandler,
 } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
-import client from "../client";
+import { session_client } from "../client";
 
 function SignUpComponent({ setSignUp }) {
   const [username, setUsername] = useState("");
@@ -52,8 +52,8 @@ function SignUpComponent({ setSignUp }) {
       return;
     }
 
-    await client
-      .post(`${client.baseURL}/signup`, "", {
+    await session_client
+      .post(`${session_client.baseURL}/signup`, {
         username: username,
         password: password,
         email: email,

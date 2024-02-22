@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import * as DocumentPicker from "expo-document-picker";
 import Icon from "react-native-vector-icons/FontAwesome";
-import client from "../client";
+import { client, session_client } from "../client";
 import { useUserContext } from "../context/UserContext";
 
 export default function Upload() {
@@ -30,11 +30,7 @@ export default function Upload() {
     form.append("description", desc);
 
     client
-      .post("/uploadvideo", userContext.token, form, {
-        headers: {
-          "Content-Type": "multipart/form-data",
-        },
-      })
+      .post("/uploadvideo", userContext.token, form)
       .then(function (res) {
         setDesc();
         setName();

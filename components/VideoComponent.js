@@ -12,7 +12,7 @@ import GestureRecognizer, {
   swipeDirections,
 } from "react-native-swipe-gestures";
 import { LogBox } from "react-native";
-import client from "../client";
+import { session_client } from "../client";
 import CommentSection from "./CommentSection";
 import { useUserContext } from "../context/UserContext";
 LogBox.ignoreLogs(["new NativeEventEmitter"]);
@@ -30,7 +30,7 @@ export default function VideoComponent() {
   var windowHeight = Dimensions.get("window").height;
 
   useEffect(() => {
-    client.get("/get_new_video", userContext.token).then(function (res) {
+    session_client.get("/get_new_video").then(function (res) {
       setCurrentVideo(res.data.video);
     });
   }, []);
@@ -42,7 +42,7 @@ export default function VideoComponent() {
 
   function video_swipe() {
     console.log("Calling video swipe");
-    client.get("/get_new_video", userContext.token).then(function (res) {
+    session_client.get("/get_new_video").then(function (res) {
       setCurrentVideo(res.data.video);
       setSeed(Math.random());
     });
@@ -52,8 +52,8 @@ export default function VideoComponent() {
     if (showComments) {
       setShowComments(false);
     } else {
-      client
-        .get(`/get_videocomments/${currentVideo.id}`, userContext.token)
+      session_client
+        .get(`/get_videocomments/${currentVideo.id}`)
         .then(function (res) {
           setCurrentVideoComments(res.data.comments);
           setShowComments(true);
@@ -87,10 +87,7 @@ export default function VideoComponent() {
                 style={{ width: windowWidth, height: windowHeight }}
                 source={{
                   // uri: `${client.baseURL}/media/video_uploads/${videoUrl}`,
-                  uri: `${client.baseURL}/streamvideo`,
-                  headers: {
-                    Authorization: `Token ${userContext.token}`,
-                  },
+                  uri: `${session_client.baseURL}/streamvideo`,
                 }}
                 resizeMode={ResizeMode.CONTAIN}
                 onPlaybackStatusUpdate={(status) => {

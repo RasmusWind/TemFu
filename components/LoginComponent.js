@@ -7,7 +7,7 @@ import {
   Text,
   BackHandler,
 } from "react-native";
-import client from "../client";
+import { client, session_client } from "../client";
 import SignUpComponent from "./SignUpComponent";
 import { useUserContext } from "../context/UserContext";
 
@@ -24,19 +24,14 @@ export default function LoginComponent() {
   }, []);
 
   function submitLogin(e) {
-    client
-      .post("/login", "", {
+    session_client
+      .post("/session_login", {
         username: username,
         password: password,
       })
-      .then(function (response) {
-        let token = response.data.token;
-        let user = response.data.user;
-        userContext.setToken(token);
-        userContext.setUser(user);
-      })
-      .catch(function (err) {
-        console.log(err);
+      .then(function (res) {
+        userContext.setUser(res.data.user);
+        userContext.setToken(res.data.token);
       });
   }
 

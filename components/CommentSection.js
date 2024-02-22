@@ -10,7 +10,7 @@ import {
 } from "react-native";
 import { useState, useEffect } from "react";
 import { useUserContext } from "../context/UserContext";
-import client from "../client";
+import { client, session_client } from "../client";
 function CommentSection({ comments, currentVideo }) {
   const userContext = useUserContext();
   const [newCommentText, setNewCommentText] = useState();
@@ -28,8 +28,13 @@ function CommentSection({ comments, currentVideo }) {
     width = dimen.width;
   };
 
-  function replyToComment(comment_id) {
-    console.log(comment_id);
+  function replyToComment(comment) {
+    userContext.ws.send(
+      JSON.stringify({
+        receiver: comment.user.username,
+        message: "Reply to: " + comment.user.username,
+      })
+    );
   }
 
   function showLinkedComments(comments) {
@@ -42,11 +47,18 @@ function CommentSection({ comments, currentVideo }) {
       user: userContext.user.id,
       text: newCommentText,
     };
+
     client
       .post("/createcomment", userContext.token, newComment)
       .then(function (res) {
         setAllComments([res.data.comment, ...allComments]);
         setNewCommentText();
+        userContext.ws.send(
+          JSON.stringify({
+            receiver: currentVideo.user.username,
+            message: userContext.user.username + " commented on your video.",
+          })
+        );
       });
   }
 
@@ -58,7 +70,7 @@ function CommentSection({ comments, currentVideo }) {
             <View style={styles.commentHeader}>
               <Image
                 source={{
-                  uri: `${client.baseURL}/${comment.user.profile.image}`,
+                  uri: `${session_client.baseURL}/${comment.user.profile.image}`,
                 }}
                 style={styles.profilepicture}
               />
@@ -77,7 +89,7 @@ function CommentSection({ comments, currentVideo }) {
                   comments({comment.comments.length})
                 </Text>
               </TouchableHighlight>
-              <TouchableHighlight onPress={() => replyToComment(comment.id)}>
+              <TouchableHighlight onPress={() => replyToComment(comment)}>
                 <Text style={styles.textColor}>reply</Text>
               </TouchableHighlight>
             </View>

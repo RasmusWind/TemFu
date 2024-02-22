@@ -6,26 +6,27 @@ import {
   TouchableHighlight,
   Button,
 } from "react-native";
-import client from "../client";
+import { session_client } from "../client";
 import { useUserContext } from "../context/UserContext";
 
 export default function ProfileComponent() {
   const userContext = useUserContext();
   function reloadUser() {
-    client
-      .get("/get_user", currentToken)
-      .then(function (res) {
-        let token = response.data.token;
+    session_client
+      .get("/session_user")
+      .then(function (response) {
         let user = response.data.user;
-        userContext.setToken(token);
-        userContext.setUser(user.username);
+        userContext.setUser(user);
       })
       .catch(function (err) {});
   }
 
   function logOut() {
-    userContext.setUser();
-    userContext.setToken();
+    session_client.post("/session_logout").then(function (res) {
+      userContext.ws.close();
+      userContext.setUser();
+      userContext.setToken();
+    });
   }
 
   return (
@@ -39,7 +40,7 @@ export default function ProfileComponent() {
       <TouchableHighlight onPress={reloadUser} style={styles.touchable}>
         <Image
           source={{
-            uri: `${client.baseURL}/media/reload.png`,
+            uri: `${session_client.baseURL}/media/reload.png`,
           }}
           style={styles.reload}
         />
@@ -48,7 +49,7 @@ export default function ProfileComponent() {
         <Image
           style={styles.image}
           source={{
-            uri: `${client.baseURL}/${userContext.user.profile.image}`,
+            uri: `${session_client.baseURL}/${userContext.user.profile.image}`,
           }}
         />
         <Text style={{ color: "white" }}>{userContext.user.username}</Text>

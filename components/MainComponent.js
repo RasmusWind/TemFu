@@ -4,29 +4,48 @@ import LoginComponent from "./LoginComponent";
 import Upload from "./Upload";
 import ProfileComponent from "./ProfileComponent";
 import Swiper from "./Swiper";
-import client from "../client";
+import { session_client } from "../client";
 import { useUserContext } from "../context/UserContext";
-import { BackHandler } from "react-native";
+import { BackHandler, LogBox, ToastAndroid, AsyncStorage } from "react-native";
+
+// import { useToast } from "react-native-toast-notifications";
+// import { WebSocket } from "react-native-websocket";
+LogBox.ignoreLogs(["new NativeEventEmitter"]);
 
 function MainComponent() {
   const userContext = useUserContext();
   useEffect(() => {
-    client
-      .get("/get_user", userContext.token)
+    session_client
+      .get("/session_user")
       .then(function (res) {
-        let response_token = res.data.token;
-        let response_user = res.data.user;
-        userContext.setToken(response_token);
-        userContext.setUser(response_user.username);
+        userContext.setUser(res.data.user);
+        userContext.setToken(res.data.token);
+        userContext.ws.onmessage = function (e) {
+          let data = JSON.parse(e.data);
+          let sender = data.sender;
+          let message = data.message;
+          ToastAndroid.showWithGravity(
+            `${sender.username} sent the message: ${message}`,
+            ToastAndroid.SHORT,
+            ToastAndroid.TOP
+          );
+        };
+        let newComment = {
+          video: 6,
+          user: 6,
+          text: "newCommentText",
+        };
+
+        client.post("/createcomment", newComment).then(function (res) {
+          console.log(res.data);
+        });
       })
       .catch(function (error) {
         userContext.setUser();
-        userContext.setToken();
       });
 
     const handleBackButtonClick = () => {
       userContext.setUser();
-      userContext.setToken();
       return true;
     };
 

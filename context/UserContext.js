@@ -1,4 +1,5 @@
 import { createContext, useContext, useState } from "react";
+import { session_client } from "../client";
 const UserContext = createContext({
   user: undefined,
   setUser: () => {},
@@ -13,6 +14,9 @@ export function useUserContext() {
 export function UserDataProvider({ children }) {
   const [user, setUser] = useState();
   const [token, setToken] = useState();
+  const ws_url = `ws://${session_client.URL}/ws/socket-server/`;
+  const ws = new WebSocket(ws_url);
+
   return (
     <UserContext.Provider
       value={{
@@ -20,6 +24,7 @@ export function UserDataProvider({ children }) {
         setUser: setUser,
         token: token,
         setToken: setToken,
+        ws: ws,
       }}
     >
       {children}
